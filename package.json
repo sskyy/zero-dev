@@ -1,6 +1,6 @@
 {
   "name": "zero-dev",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "dev for icejs",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,10 @@
     "co": "3.x"
   },
   "zero": {
-    "dependencies": {},
+    "dependencies": {
+      "statics": "^0.0.1",
+      "request": "^0.0.1"
+    },
     "name": "dev"
   },
   "author": "jiamiu",
