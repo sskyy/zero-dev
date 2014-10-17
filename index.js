@@ -1,60 +1,69 @@
-var config = require('./config')
+var q = require('q'),
+  path = require('path'),
+  _ = require('lodash')
 
-
-var userModule = {
-  models : require('./models'),
-  listen : require('./listen')(config),
-  //this will allow app global config overwrite
-  config : config,
-  route : {
-    "/user/count" : function( req, res, next){
-      userModule.dep.model.models['user'].count().then(function(total){
-        res.json({count:total})
-      })
-    },
-    "*" : {
-      "function" : function initSession(req,res,next){
-        //TODO only for dev
-        if( !req.session.user ){
-          userModule.dep.model.models['user'].count().then(function(total){
-            var skip = parseInt( total * Math.random())
-            userModule.dep.model.models['user'].find({limit:1,skip:skip}).then(function(users){
-//              console.log("====================setting session user===========", users[0].name)
-//              req.session.user = users[0]
-              next()
-            }).catch(function(err){
-              ZERO.error(err)
-              next()
-            })
-          })
-        }else{
-          next()
-        }
-
-
-
-
-        return
-
-//        if( req.session.user ){
-//          next()
-//        }else{
-//          //TODO only for dev
-//          userModule.dep.model.models['user'].find({limit:1}).then(function(users){
-//            req.session.user = users[0]
-//            next()
-//          }).catch(function(err){
-//            ZERO.error(err)
-//            next()
-//          })
-//        }
-
-      },
-      "order" : {first:true}
-    }
-
-  }
+function duplicate(str, num) {
+  return (new Array(num + 1)).join(str)
 }
 
-module.exports = userModule
+function cleanCircular(object, preCached) {
+  preCached = preCached || {}
+  var cached = _.values(preCached),
+    cachedNamespace = _.keys(preCached)
 
+    ;
+  (function _cleanCircular(obj, namespace) {
+    _.forEach(obj, function (v, k) {
+      if (!obj.hasOwnProperty(k)) return
+      var i = cached.indexOf(v)
+
+      if (v === obj) {
+        obj[k] = "{circular reference of root object}"
+      } else if (i !== -1) {
+        obj[k] = "{circular reference of " + cachedNamespace[i] + "}"
+      } else {
+        if (_.isArray(v) || _.isObject(v)) {
+          cached.push(v)
+          namespace.push(k)
+          cachedNamespace.push(namespace.join('.'))
+          _cleanCircular(v, namespace)
+        }
+      }
+    })
+  }(object, []))
+
+  return object
+}
+
+module.exports = {
+  deps: ['statics', 'request'],
+  route: {
+    "/dev/simulate": {
+      "function": function (req, res) {
+
+        var url = req.body.url,
+          method = req.body.method,
+          data = req.body.data
+
+        req.body = data
+
+        req.bus.fire('request.mock', {url: url, method: method, req: req, res: res})
+
+        //all done
+        console.log(req.bus['$$results'])
+        req.bus.then(function () {
+          ZERO.mlog('dev', 'mock', url, 'done')
+          try {
+            res.json(cleanCircular(req.bus.$$traceRoot))
+          } catch (e) {
+            res.status(500).end()
+          }
+        })
+      },
+      order: {before: "respond.respondHandler"}
+    }
+  },
+  statics: {
+    "/dev": path.join(__dirname, './public')
+  }
+}
