@@ -6,12 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies" : {
-    "when" : "3.x",
-    "co" : "3.x"
+  "dependencies": {
+    "when": "3.x",
+    "co": "3.x"
   },
-  "zero" : {
-    "dependencies":{}
+  "zero": {
+    "dependencies": {},
+    "name": "dev"
   },
   "author": "jiamiu",
   "license": "MIT"
