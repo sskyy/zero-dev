@@ -50,7 +50,7 @@ module.exports = {
         req.bus.fire('request.mock', {url: url, method: method, req: req, res: res})
 
         //all done
-        console.log(req.bus['$$results'])
+        //console.log(req.bus['$$results'])
         req.bus.then(function () {
           ZERO.mlog('dev', 'mock', url, 'done')
           try {
