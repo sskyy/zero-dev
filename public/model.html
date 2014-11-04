@@ -1,0 +1,22 @@
+<div>
+    <div ng-repeat="(name,model) in models">
+        <h2>{{name}}</h2>
+        <div ng-include="'table-view.tpl.html'">
+
+        </div>
+
+    </div>
+
+    <script type="text/ng-template" id="table-view.tpl.html">
+        <table class="table table-bordered">
+            <tr ng-repeat="(k,model) in model">
+                <td>{{k}}</td>
+                <td ng-if="(model|is:'Object')" class="no-padding">
+                    <div ng-include="'table-view.tpl.html'"></div>
+                </td>
+                <td ng-if="(model|not:'Object')">{{model}}</td>
+            </tr>
+        </table>
+    </script>
+
+</div>

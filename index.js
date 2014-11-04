@@ -41,8 +41,7 @@ function cleanCircular(object, preCached) {
   return object
 }
 
-module.exports = {
-  deps: ['statics', 'request'],
+var devModule = {
   route: {
     "/dev/simulate": {
       "function": function (req, res) {
@@ -67,6 +66,14 @@ module.exports = {
         })
       },
       order: {before: "respond.respondHandler"}
+    },
+    "/dev/model" : function( req, res){
+      res.json(_.mapValues(devModule.dep.model.models,function( model){
+        //return _.mapValues( model,function(m){
+        //  return typeof m
+        //})
+        return _.pick(model,['rest','isNode','isFile','relations','security','attributes'])
+      }))
     }
   },
   statics: {
@@ -135,3 +142,6 @@ module.exports = {
     "order" : {last:true}
   }
 }
+
+
+module.exports = devModule

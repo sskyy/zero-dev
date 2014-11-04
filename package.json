@@ -1,6 +1,6 @@
 {
   "name": "zero-dev",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "dev for icejs",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,9 @@
   "zero": {
     "dependencies": {
       "statics": "^0.0.1",
-      "request": "^0.0.1"
+      "request": "^0.0.1",
+      "model": "^0.0.1",
+      "bus": "^0.0.1"
     },
     "name": "dev"
   },
