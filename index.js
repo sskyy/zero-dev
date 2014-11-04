@@ -77,7 +77,7 @@ var devModule = {
     }
   },
   statics: {
-    "/dev": path.join(__dirname, './public')
+    "/dev": './public'
   },
   bootstrap : {
     "function" : function( app, server){
