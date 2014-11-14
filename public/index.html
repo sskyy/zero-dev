@@ -1,18 +1,37 @@
 <html>
 <head>
-    <script src="js/snap.svg-min.js"></script>
-    <script src="js/jquery-2.1.0.min.js"></script>
-    <script src="js/jquery.simple-color.min.js"></script>
-    <script src="js/angular.min.js"></script>
-    <script src="js/angular-ui-router.min.js"></script>
-    <script src="js/lodash.compat.min.js"></script>
+    <script src="lib/snap.svg-min.js"></script>
+    <script src="lib/jquery-2.1.0.min.js"></script>
+    <script src="lib/jquery.simple-color.min.js"></script>
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/angular-ui-router.min.js"></script>
+    <script src="lib/angular-sanitize.min.js"></script>
+    <script src="lib/lodash.compat.min.js"></script>
     <link href="css/simple-color.css" rel="stylesheet"/>
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/font-awesome.min.css" rel="stylesheet"/>
     <link href="css/diagram.css" rel="stylesheet"/>
     <link href="css/main.css" rel="stylesheet"/>
-    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js"></' + 'script>')</script>
-    <script src="js/paint.js"></script>
-    <script src="js/main.js"></script>
+
+    <link href="lib/jsonView/jquery.jsonview.css" rel="stylesheet"/>
+    <script src="lib/jsonView/jquery.jsonview.js"></script>
+
+    <!--<link href="lib/tipped/tipped.css" rel="stylesheet">-->
+    <!--<script src="lib/tipped/tipped.js"></script>-->
+
+    <!--<script src="lib/tooltipsy.min.js"></script>-->
+
+    <link href="lib/tooltipster/css/tooltipster.css" rel="stylesheet"/>
+    <script src="lib/tooltipster/js/jquery.tooltipster.js"></script>
+
+    <!--<link href="lib/jquery.qtip.custom/jquery.qtip.min.css" rel="stylesheet"/>-->
+    <!--<script src="lib/jquery.qtip.custom/jquery.qtip.js"></script>-->
+
+    <script src="modules/mock/mock.js"></script>
+    <script src="modules/model/model.js"></script>
+    <script src="modules/api/api.js"></script>
+    <script src="modules/event/event.js"></script>
+    <script src="modules/index/index.js"></script>
 </head>
 <body ng-app="dev">
 
@@ -25,8 +44,8 @@
             <ul class="nav navbar-nav">
                 <li ui-sref-active="mock"><a ui-sref="mock">Mock</a></li>
                 <li ui-sref-active="model"><a ui-sref="model">Model</a></li>
-                <li ui-sref-active="api"><a href="#">API</a></li>
-                <li ui-sref-active="event"><a href="#">Event</a></li>
+                <li ui-sref-active="api"><a ui-sref="api">API</a></li>
+                <li ui-sref-active="event"><a ui-sref="event">Event</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -47,7 +66,7 @@
 
 
 
-<div class="container-fluid">
+<div class="container-fluid footer">
     <ul class="nav nav-pills" role="tablist">
         <li role="presentation"><a style="color:#999">zerojs dev tool 0.0.1</a></li>
         <li role="presentation"><a href="http://zerojs.io" class="item">zerojs.io</a></li>

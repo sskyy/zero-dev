@@ -1,0 +1,194 @@
+<div>
+    <form class="container pd10" >
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <input type="text" id="url" class="form-control" placeholder="url" ng-model="url">
+                </div>
+                <div class="col-sm-4" ng-init="method='get'">
+                    <select ng-model="method" class="form-control">
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                    </select>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+        </div>
+        <div class="form-group" ng-repeat="(k,v) in data">
+            <div class="row">
+                <div class="col-sm-4">
+                    <input type="text" value="{{k}}" class="form-control">
+                </div>
+                <div class="col-sm-4">
+                    <input type="text" value="{{v}}"  class="form-control">
+                </div>
+                <div class="col-sm-4">
+                    <a class='btn btn-danger'  ng-click="deleteData(k)">-</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <input type="text" ng-model="newDataKey" class="form-control" placeholder="参数键">
+                </div>
+                <div class="col-sm-4">
+                    <input type="text" ng-model="newDataValue" class="form-control" placeholder="参数值">
+                </div>
+                <div class="col-sm-4">
+                    <a class='btn btn-success'  ng-click="addData()">+</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group">
+            <a class='btn btn-success' id="getDiagram" ng-click="send()">SEND</a>
+        </div>
+    </form>
+
+
+
+
+    <div id="moduleSwitches" class="pd10">
+
+        <div ng-repeat="(module,color) in modules" class="switch">
+            <input class="colorPicker" color-picker color-container="modules" color-id="module"/>
+            <span>{{module}}</span>
+        </div>
+
+    </div>
+
+    <div class="diagram" ng-include="'listener.tpl.html'"></div>
+
+
+        <!--<svg id="diagram"></svg>-->
+
+
+    <div class="ui modal" id="descDialog">
+        <i class="close icon"></i>
+        <div class="header">描述</div>
+        <div class="content ui form">
+            <div class="inline fields">
+                <div class="field">
+                    <input style="width: 500px" type="text" id="descInput" name="desc">
+                </div>
+                <div class="field">
+                    <div class="ui button" id="doneDialog">OK</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<svg id="diagram2"></svg>-->
+
+
+
+
+
+<script type="text/ng-template" id="listener.tpl.html">
+    <div class="listener">
+        <div class="listenerName" class="module-{{listener.module}}}" style="background:{{modules[listener.module]}}">
+            <span>{{listener.name}}</span>
+            <span class="meta" ng-if="listener.argv" json-tooltip="listener.argv">
+                <i class="fa fa-arrow-down"></i>
+            </span>
+            <span class="meta" ng-if="listener.result" json-tooltip="listener.result">
+                <i class="fa fa-arrow-up"></i>
+            </span>
+            <span class="meta" ng-if="listener.data" json-tooltip="listener.data">
+                <i class="fa fa-map-marker"></i>
+            </span>
+        </div>
+
+        <div class="triggeredEvents">
+            <div class="triggeredEvent" event-triggered="triggeredEvent" ng-repeat="triggeredEvent in listener.stack">
+                <div class="eventName">{{triggeredEvent.name}}</div>
+                <div class="matchedEvents" >
+                    <div class="matchedEvent" ng-repeat="matchedEvent in triggeredEvent.attached">
+                        <div class="eventNameMatched">{{matchedEvent.namespace}}</div>
+                        <div class="listeners">
+                            <div ng-repeat="listener in matchedEvent.listeners" ng-include="'listener.tpl.html'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+    <style>
+        .listener{
+            white-space:nowrap;
+            display:inline-block;
+        }
+        .listenerName{
+            background: #99ccff;
+            line-height: 30px;
+            padding: 0 10px;
+        }
+
+        .listenerName .meta{
+            margin-left: 10px;
+            color:#fff;
+        }
+        .triggeredEvents{
+            margin-top: 10px;
+        }
+
+        .triggeredEvent{
+            display: inline-block;
+            margin-left:20px;
+            vertical-align: top;
+            position:relative;
+        }
+        .eventName{
+            line-height: 30px;
+            display: inline-block;
+            vertical-align: top;
+            padding-left: 10px;
+
+        }
+        .matchedEvents{
+            display: inline-block;
+            /*padding-left: 10px;*/
+            margin-top: 30px;
+            margin-left: -4px;
+            /*position: relative;*/
+        }
+
+        .eventNameMatched{
+            line-height: 30px;
+            display:inline-block;
+            vertical-align: top;
+            padding-left: 10px;
+            position: absolute;
+            left: 0;
+            color:#999;
+
+        }
+        .listeners{
+            display: inline-block;
+        }
+
+
+        .diagram{
+            overflow-x:auto ;
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 500px;
+        }
+
+        .triggeredEvent svg{
+            vertical-align: top;
+            margin: -10px 0 0 10px;
+        }
+
+        .jsonview{
+            width: 500px;
+        }
+
+    </style>
+</div>

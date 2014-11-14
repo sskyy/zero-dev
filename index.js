@@ -1,4 +1,4 @@
-var q = require('q'),
+var Promise = require('bluebird'),
   path = require('path'),
   _ = require('lodash'),
   flo = require('fb-flo-extra'),
@@ -6,39 +6,76 @@ var q = require('q'),
   modulePath = "./modules",
   colors = require("colors"),
   argv = require('optimist').argv,
-  fs = require("fs")
+  fs = require("fs"),
+  util = require("../../system/core/util")
 
 function duplicate(str, num) {
   return (new Array(num + 1)).join(str)
 }
 
-function cleanCircular(object, preCached) {
-  preCached = preCached || {}
-  var cached = _.values(preCached),
-    cachedNamespace = _.keys(preCached)
+//function cleanCircular(object, preCached) {
+//  preCached = preCached || {}
+//  var cached = _.values(preCached),
+//    cachedNamespace = _.keys(preCached)
+//
+//    ;
+//  (function _cleanCircular(obj, namespace) {
+//    _.forEach(obj, function (v, k) {
+//      if (!obj.hasOwnProperty(k)) return
+//      var i = cached.indexOf(v)
+//
+//      if (v === obj) {
+//        obj[k] = "{circular reference of root object}"
+//      } else if (i !== -1) {
+//        obj[k] = "{circular reference of " + cachedNamespace[i] + "}"
+//      } else {
+//        if (_.isArray(v) || _.isObject(v)) {
+//          cached.push(v)
+//          namespace.push(k)
+//          cachedNamespace.push(namespace.join('.'))
+//          _cleanCircular(v, namespace)
+//        }
+//      }
+//    })
+//  }(object, []))
+//
+//  return object
+//}
 
-    ;
-  (function _cleanCircular(obj, namespace) {
-    _.forEach(obj, function (v, k) {
-      if (!obj.hasOwnProperty(k)) return
-      var i = cached.indexOf(v)
+function cleanCircular(parent, k, preCached){
 
-      if (v === obj) {
-        obj[k] = "{circular reference of root object}"
-      } else if (i !== -1) {
-        obj[k] = "{circular reference of " + cachedNamespace[i] + "}"
-      } else {
-        if (_.isArray(v) || _.isObject(v)) {
-          cached.push(v)
-          namespace.push(k)
-          cachedNamespace.push(namespace.join('.'))
-          _cleanCircular(v, namespace)
-        }
+  if(_.isObject(parent[k])){
+    _.forEach( preCached, function( cache){
+      if( parent[k] === cache.value ){
+        parent[k] = '{circular reference of '+cache.key+'}'
       }
     })
-  }(object, []))
 
-  return object
+    var key = _.last(preCached) ? _.last(preCached).key + "." +k : k
+    preCached.push({key: key,value:parent[k]})
+    _.forEach( parent[k], function( v, kk ){
+      cleanCircular( parent[k], kk, preCached)
+    })
+    preCached.pop()
+  }
+  return parent[k]
+}
+
+function extractPromise(obj){
+  if(_.isObject( obj)){
+      _.forEach( obj, function( v, k){
+      if( util.isPromiseAlike((v) ) ){
+        if(v.isFulfilled()){
+          obj[k] = extractPromise(v.value())
+        }else if(v.isRejected()){
+          obj[k] = v.reason()
+        }
+      }else{
+        extractPromise( v )
+      }
+    })
+  }
+  return obj
 }
 
 var devModule = {
@@ -59,8 +96,9 @@ var devModule = {
         req.bus.then(function () {
           ZERO.mlog('dev', 'mock', url, 'done')
           try {
-            res.json(cleanCircular(req.bus.$$traceRoot))
+            res.json( extractPromise( cleanCircular({root:req.bus.$$traceRoot},"root",[]) ))
           } catch (e) {
+            console.trace(e )
             res.status(500).end()
           }
         })
@@ -74,6 +112,12 @@ var devModule = {
         //})
         return _.pick(model,['rest','isNode','isFile','relations','security','attributes'])
       }))
+    },
+    "/dev/route" : function( req, res){
+      res.json( devModule.dep.request.routes.toArray() )
+    },
+    "/dev/listener" : function( req, res){
+      res.json( devModule.dep.bus.listeners )
     }
   },
   statics: {

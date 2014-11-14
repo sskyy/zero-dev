@@ -1,0 +1,34 @@
+<div>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>method</th>
+            <th>url</th>
+            <th class="no-padding">
+                <table class="table table-bordered">
+                    <tr>
+                        <th colspan="3">handlers</th>
+                    </tr>
+                    <tr>
+                        <th width="100">module</th>
+                        <th width="300">name</th>
+                        <th>order</th>
+                    </tr>
+                </table>
+            </th>
+        </tr>
+        <tr ng-repeat="route in routes">
+            <td>{{route.method}}</td>
+            <td>{{route.url}}</td>
+            <td class="no-padding">
+                <table class="table table-ordered">
+                    <tr ng-repeat="handler in route.handler">
+                        <td width="100">{{handler.module}}</td>
+                        <td width="300">{{handler.name}}</td>
+                        <td>{{handler.order}}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

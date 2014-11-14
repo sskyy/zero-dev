@@ -1,0 +1,29 @@
+<div>
+    <table class="table table-bordered">
+        <tr>
+            <th>event</th>
+            <th class="no-padding">
+                <table class="table table-bordered">
+                    <tr>
+                        <th colspan="3">handlers</th>
+                    </tr>
+                    <tr>
+                        <th width="100">module</th>
+                        <th >name</th>
+                    </tr>
+                </table>
+            </th>
+        </tr>
+        <tr ng-repeat="(event,handlers) in listeners">
+            <td>{{event}}</td>
+            <td class="no-padding">
+                <table class="table table-ordered">
+                    <tr ng-repeat="handler in handlers">
+                        <td width="100">{{handler.module}}</td>
+                        <td >{{handler.listener}}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
