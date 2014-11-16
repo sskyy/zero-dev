@@ -1,0 +1,11 @@
+{
+  "name": "",
+  "version": "0.0.1",
+  "zero" : {
+    "dependencies" : {
+      "bus" : "^0.0.1"
+    },
+    "generated" : true
+  }
+
+}

@@ -2,21 +2,91 @@ line{
     stroke :rgb(99,99,99);
     stroke-width :2
 }
-text{
+
+.listener{
+    white-space:nowrap;
+    display:inline-block;
+}
+.listenerName{
+    background: #99ccff;
     line-height: 30px;
-    alignment-baseline: hanging;
-    font-size: 16px;
-}
-text.match{
-    stroke:#ccc;
-    stroke-width:1px;
-}
-text.args{
-    stroke:#ccc;
-    stroke-width:1px;
-}
-text.module-ref{
-    cursor: pointer;
+    padding: 0 10px;
 }
 
+.listenerName .meta{
+    margin-left: 10px;
+    color:#fff;
+}
+
+.listenerName .meta .fa-warning{
+    color: #bf1300;
+}
+
+
+
+.newListener{
+    outline: 2px #005888 solid;
+}
+.triggeredEvents{
+    margin-top: 10px;
+}
+
+.triggeredEvent{
+    display: inline-block;
+    margin-left:20px;
+    vertical-align: top;
+    position:relative;
+}
+.eventName{
+    line-height: 30px;
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 10px;
+
+}
+.matchedEvents{
+    display: inline-block;
+    /*padding-left: 10px;*/
+    margin-top: 30px;
+    margin-left: -4px;
+    /*position: relative;*/
+}
+
+.newMatchedEvent{
+    display: none;
+}
+
+.triggeredEvent:hover > .matchedEvents > .newMatchedEvent{
+    display: block;
+}
+
+.eventNameMatched{
+    line-height: 30px;
+    display:inline-block;
+    vertical-align: top;
+    padding-left: 10px;
+    position: absolute;
+    left: 0;
+    color:#999;
+
+}
+.listeners{
+    display: inline-block;
+}
+
+
+.diagram{
+    overflow-x:auto ;
+    background: #fff;
+    padding: 30px 15px;
+}
+
+.triggeredEvent svg{
+    vertical-align: top;
+    margin: -10px 0 0 10px;
+}
+
+.jsonview{
+    width: 500px;
+}
 

@@ -7,6 +7,8 @@ var Promise = require('bluebird'),
   colors = require("colors"),
   argv = require('optimist').argv,
   fs = require("fs"),
+  fse = require("fs-extra"),
+  toSource = require('toSource'),
   util = require("../../system/core/util")
 
 function duplicate(str, num) {
@@ -78,6 +80,13 @@ function extractPromise(obj){
   return obj
 }
 
+function extendButConcatArray(obj1, obj2){
+  _.forOwn( obj2, function( v, k){
+      obj1[k] = _.isArray( obj1[k]) ? obj1.concat( v ) : v
+  })
+  return obj1
+}
+
 var devModule = {
   route: {
     "/dev/simulate": {
@@ -118,6 +127,59 @@ var devModule = {
     },
     "/dev/listener" : function( req, res){
       res.json( devModule.dep.bus.listeners )
+    },
+    "/dev/source" : function( req, res){
+      var source = _.find( devModule.dep.bus.listeners[req.param('event')], function( listener ){
+        var listenerName = listener.module + "." + (listener.name || 'anonymous')
+        console.log( listener )
+        return listenerName == req.param('name')
+      })
+      if( source ){
+        res.json( toSource( _.isFunction( source) ? source : source.function ))
+      }else{
+        res.status(404).end()
+      }
+    },
+    "/dev/save" : function( req, res){
+      var modulePath = path.join(__dirname,"../", req.param("module"))
+      if( !fs.existsSync(modulePath) ){
+        fse.copySync( path.join(__dirname,"generator"), modulePath)
+        fs.readdirSync(modulePath).forEach(function( file){
+          if( /\.tpl\.js$/.test(file) ){
+            fs.renameSync( path.join( modulePath, file), path.join( modulePath, file.replace(".tpl.",".")))
+          }
+        })
+      }else if( !require(path.join(modulePath,'package.json')).zero.generated){
+        return res.status(406).end()
+      }
+
+
+      console.log( path.join(modulePath,'package.json'),fse.readJSONSync( path.join(modulePath,'package.json')) )
+
+      //deal with package.json
+      fse.outputJSONSync( path.join(modulePath,'package.json'),
+        _.extend(fse.readJSONSync( path.join(modulePath,'package.json')), {name:"zero-"+ req.param('module')}) )
+
+
+      //deal with listener.js
+      var anno = ["/* DEV START: LISTENERS */","/* DEV END: LISTENERS */"]
+      var annoRegExp = new RegExp( anno.map(function(r){ return r.replace(/(\/|\*)/g,"\\$1")}).join("(.|\\s|\\n)*"))
+
+
+
+      var newListener = {}
+      //notice here, we need to make listener an array, so module can attach multiple listener to one event.
+      eval("newListener['"+req.param('event')+"']=["+ req.param('source') +"]")
+
+      fse.outputFileSync(path.join(modulePath,'listener.js'),
+        fs.readFileSync( path.join(modulePath,'listener.js'),'utf8').replace( annoRegExp ,
+          [ anno[0],
+            "return " + toSource( extendButConcatArray( require(path.join(modulePath,'listener.js'))({}), newListener )),
+            anno[1]].join("\n")
+        ))
+
+
+      res.status(200).end()
     }
   },
   statics: {

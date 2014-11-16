@@ -1,15 +1,13 @@
-angular.module("mock",['ui.router']).config(function($stateProvider,$urlRouterProvider){
+angular.module("mock",['ui.router','ui.codemirror','ui.bootstrap.modal','ui.bootstrap.tpls']).config(function($stateProvider,$urlRouterProvider){
   $stateProvider
     .state('mock', {
       url : '/mock',
       templateUrl: '/dev/modules/mock/mock.html',
       controller : 'mock'
     })
-
   $urlRouterProvider.otherwise("/mock");
-
 })
-  .controller("mock",function($scope,$http){
+  .controller("mock",function($scope,$http,$modal){
 
   $scope.modules = {}
 
@@ -51,46 +49,70 @@ angular.module("mock",['ui.router']).config(function($stateProvider,$urlRouterPr
     delete $scope.data[k]
   }
 
-  $scope.addData = function() {
-    if (!$scope.newDataKey || !$scope.newDataValue) return false
-
-    var newData = {}
-    newData[$scope.newDataKey] = $scope.newDataValue
-    angular.extend($scope.data, newData)
-    console.log( $scope.data )
+  $scope.addData = function(value, key, data) {
+    if (!value || !key ) return false
+    angular.extend(data, _.zipObject([key],[value]))
     reset()
   }
 
-    $scope.send("/post","get",{})
+  $scope.editSource = function( event, namespace, module, name){
+    $http.get('/dev/source?event='+event+'&module='+module+"&name="+name).success(function(data){
+      $scope.source = {
+        event : event,
+        module : module,
+        name : name,
+        namespace : namespace,
+        "function":data.slice(1, data.length -1).replace(/\\n/g,"\n").replace(/\\"/g,'"') }
+    }).catch(function(){
+      $scope.source = {
+        event: event,
+        module: module,
+        name: name,
+        namespace: namespace,
+        "function": "function " + name.split(".").pop() + "(){ }"
+      }
+    })
+  }
 
-}).directive("colorPicker",function(){
-    return function( scope,ele,attrs){
-      $(ele).simpleColor({
-        defaultColor : "#99ccff",
-        cellWidth :16,
-        cellHeight : 16,
-        boxWidth : 16,
-        boxHeight:16,
-        chooserCSS:{
-          border:"1px solid #fff",
-          background: "#f5f5f5"
-        },
-        displayCSS:{
-          "-webkit-border-radius": "2px",
-          "-moz-border-radius": "2px",
-          "border-radius": "2px",
-          "border":"none",
-          "border-bottom": "1px solid rgba(0,0,0,0.2)"
-        },
-        onSelect : function( c){
-          scope.$apply(function(){
-            var model = scope.$eval(attrs['colorContainer']),id=scope.$eval(attrs['colorId'])
-            model[id] = "#"+c
-          })
-        }
+
+  $scope.addListenerModal = function( event, attached ){
+    var scope = $scope.$new()
+    scope.newListener = { namespace:event, "new":true}
+    var modalInstance = $modal.open({
+      templateUrl: 'addListener.tpl.html',
+      scope : scope,
+      backdrop : false
+    });
+
+    modalInstance.result.then(function (listener) {
+      var existMatchedEvent = _.find( attached, function( matchedEvent){
+        return matchedEvent.namespace = scope.newListener.namespace
+      })
+
+      listener.name = listener.module+"."+listener.name
+
+      if( existMatchedEvent){
+        existMatchedEvent.listeners.push( listener)
+      }else{
+        attached.push({
+          namespace:listener.namespace,
+          listeners : [listener]
+        })
+      }
+
+    });
+  }
+
+  $scope.save = function( source ){
+      $http.post("/dev/save",{event:source.namespace, source:source["function"],module:source.module}).then(function(){
+        source.saved = true
       })
     }
-  }).directive("eventTriggered",function(){
+
+
+  $scope.send("/post","get",{})
+
+}).directive("eventTriggered",function(){
 
     return function( scope, ele,attrs){
       var triggeredEvent = scope.$eval( attrs['eventTriggered'])
@@ -112,26 +134,7 @@ angular.module("mock",['ui.router']).config(function($stateProvider,$urlRouterPr
 
         .insertAfter( $(ele[0]).find("> .eventName")[0])
     }
-  }).directive("jsonTooltip",function(){
-      return function( scope,ele,attrs){
-
-        var content = scope.$eval(attrs['jsonTooltip']),
-          jsonView = _.isObject(content) ? $("<div></div>").JSONView( content, {collapsed: true} ) : content
-
-        $(ele[0]).tooltipster({
-          content:jsonView,
-          //content:"jsonView",
-          position:'bottom',
-          fixed : true,
-          interactive : true,
-          contentCloning : false,
-          positionTracker : false
-        })
-        //Tipped.create( ele[0],jsonView)
-
-      }
   })
-
 
 
 
@@ -147,5 +150,40 @@ function createSVGElement( e,attr){
   var $el = Snap( document.createElementNS('http://www.w3.org/2000/svg', e) )
   return attr ? $el.attr(attr) : $el
 }
+
+
+(function(){
+  var cache = {};
+
+  this.tmpl = function tmpl(str, data){
+    // Figure out if we're getting a template, or if we need to
+    // load the template - and be sure to cache the result.
+    var fn = !/\W/.test(str) ?
+      cache[str] = cache[str] ||
+      tmpl(document.getElementById(str).innerHTML) :
+
+      // Generate a reusable function that will serve as a template
+      // generator (and which will be cached).
+      new Function("obj",
+        "var p=[],print=function(){p.push.apply(p,arguments);};" +
+
+          // Introduce the data as local variables using with(){}
+        "with(obj){p.push('" +
+
+          // Convert the template into pure JavaScript
+        str
+          .replace(/[\r\t\n]/g, " ")
+          .split("<%").join("\t")
+          .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+          .replace(/\t=(.*?)%>/g, "',$1,'")
+          .split("\t").join("');")
+          .split("%>").join("p.push('")
+          .split("\r").join("\\'")
+        + "');}return p.join('');");
+
+    // Provide some basic currying to the user
+    return data ? fn( data ) : fn;
+  };
+})();
 
 

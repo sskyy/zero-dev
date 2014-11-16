@@ -1,4 +1,12 @@
 <div>
+    <div id="moduleSwitches" class="pd10">
+
+        <div ng-repeat="(module,color) in modules" class="switch">
+            <input class="colorPicker" color-picker='{container:modules,default:"#fff",id:module}'/>
+            <span>{{module}}</span>
+        </div>
+    </div>
+
     <table class="table table-bordered">
         <tr>
             <th>event</th>
@@ -18,9 +26,9 @@
             <td>{{event}}</td>
             <td class="no-padding">
                 <table class="table table-ordered">
-                    <tr ng-repeat="handler in handlers">
+                    <tr ng-repeat="handler in handlers" style="background: {{modules[handler.module]}}">
                         <td width="100">{{handler.module}}</td>
-                        <td >{{handler.listener}}</td>
+                        <td >{{handler.name}}</td>
                     </tr>
                 </table>
             </td>

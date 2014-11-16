@@ -1,12 +1,25 @@
 <html>
 <head>
+    <title>Zero Dev Tool</title>
     <script src="lib/snap.svg-min.js"></script>
     <script src="lib/jquery-2.1.0.min.js"></script>
     <script src="lib/jquery.simple-color.min.js"></script>
     <script src="lib/angular.min.js"></script>
     <script src="lib/angular-ui-router.min.js"></script>
     <script src="lib/angular-sanitize.min.js"></script>
+    <script src="lib/angular-bootstrap-modal/angular-bootstrap-modal.js"></script>
+    <script src="lib/angular-bootstrap-modal/angular-bootstrap-modal-tpls.js"></script>
     <script src="lib/lodash.compat.min.js"></script>
+    <script src="lib/codemirror/codemirror.js"></script>
+
+    <link href="lib/codemirror/codemirror.css" rel="stylesheet"/>
+    <link href="lib/codemirror/themes/solarized.css" rel="stylesheet"/>
+
+    <link href="lib/codemirror/addons/hint/show-hint.css" rel="stylesheet">
+    <script src="lib/codemirror/addons/hint/show-hint.js"></script>
+    <script src="lib/codemirror/addons/hint/javascript-hint.js"></script>
+    <script src="lib/codemirror/modes/javascript/javascript.js"></script>
+
     <link href="css/simple-color.css" rel="stylesheet"/>
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
     <link href="css/font-awesome.min.css" rel="stylesheet"/>
@@ -27,6 +40,7 @@
     <!--<link href="lib/jquery.qtip.custom/jquery.qtip.min.css" rel="stylesheet"/>-->
     <!--<script src="lib/jquery.qtip.custom/jquery.qtip.js"></script>-->
 
+    <script src="modules/mock/codemirror.js"></script>
     <script src="modules/mock/mock.js"></script>
     <script src="modules/model/model.js"></script>
     <script src="modules/api/api.js"></script>
