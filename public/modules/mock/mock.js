@@ -110,7 +110,7 @@ angular.module("mock",['ui.router','ui.codemirror','ui.bootstrap.modal','ui.boot
     }
 
 
-  $scope.send("/post","get",{})
+  //$scope.send("/post","get",{})
 
 }).directive("eventTriggered",function(){
 

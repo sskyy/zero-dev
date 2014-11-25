@@ -33,7 +33,7 @@ angular.module('dev',['ui.router','mock','model','api','event'])
         },
         onSelect : function( c){
           scope.$apply(function(){
-            config.container[config.id] = "#"+c
+            scope.$eval(attrs['colorPicker']).container[config.id] = "#"+c
           })
         }
       })

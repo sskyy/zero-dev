@@ -1,34 +1,46 @@
 <div>
 
+    <div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <input type="text" id="url" class="form-control" placeholder="url" ng-model="url">
+                </div>
+                <div class="col-sm-4" >
+                    <select ng-model="method" ng-init="method='get'" class="form-control">
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <a class='btn btn-success' ng-disabled="!url||!method" ng-click="url&&(matchedRouteIndexes=getMatchedRouteIndexes(url,method,routes))">match</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="moduleSwitches" class="pd10">
+        <div ng-repeat="(module,color) in modules" class="switch">
+            <input class="colorPicker" color-picker='{container:modules,default:"#fff",id:module}'/>
+            <span>{{module}}</span>
+        </div>
+    </div>
     <table class="table table-bordered">
         <tr>
             <th>method</th>
             <th>url</th>
-            <th class="no-padding">
-                <table class="table table-bordered">
-                    <tr>
-                        <th colspan="3">handlers</th>
-                    </tr>
-                    <tr>
-                        <th width="100">module</th>
-                        <th width="300">name</th>
-                        <th>order</th>
-                    </tr>
-                </table>
-            </th>
+            <th >module</th>
+            <th>name</th>
+            <th>order</th>
         </tr>
-        <tr ng-repeat="route in routes">
+        <tr ng-repeat="(k,route) in routes" style="background: {{modules[route.handler.module]}};{{matchedRouteIndexes[k]&&('outline: 2px #18bc9c solid')}}">
             <td>{{route.method}}</td>
             <td>{{route.url}}</td>
-            <td class="no-padding">
-                <table class="table table-ordered">
-                    <tr ng-repeat="handler in route.handler">
-                        <td width="100">{{handler.module}}</td>
-                        <td width="300">{{handler.name}}</td>
-                        <td>{{handler.order}}</td>
-                    </tr>
-                </table>
-            </td>
+            <td >{{route.handler.module}}</td>
+            <td >{{route.handler.name}}</td>
+            <td>{{route.handler.order}}</td>
         </tr>
     </table>
 </div>

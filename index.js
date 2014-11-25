@@ -8,7 +8,7 @@ var Promise = require('bluebird'),
   argv = require('optimist').argv,
   fs = require("fs"),
   fse = require("fs-extra"),
-  toSource = require('toSource'),
+  toSource = require('tosource'),
   util = require("../../system/core/util")
 
 function duplicate(str, num) {
@@ -201,12 +201,13 @@ var devModule = {
           })
         }
 
-        if( module.theme && module.theme.directory ){
-
-          statics[path.join(modulePath,module.name, module.theme.directory)] = {
-            url : '/' + module.name,
-            origin : path.join( root, modulePath, module.name, module.theme.directory )
-          }
+        if( module.theme  ){
+          ( [].concat(module.theme) ).forEach(function( theme ){
+            statics[path.join(modulePath,module.name, theme.directory)] = {
+              url : '/' + module.name,
+              origin : path.join( root, modulePath, module.name, theme.directory )
+            }
+          })
         }
       })
 
